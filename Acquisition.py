@@ -39,10 +39,8 @@ class Acquisition(threading.Thread):
             i = 0
             while self.__running and i < self.__max_count:
                 self.__elapsed_time = time.time() - start_time
-#                adc_value = self.__get_adc_value()
-#                self.__data.append([self.__elapsed_time, adc_value])
-                self.__data.append([1,1])
-#                print(elapsed_time, adc_value)
+                adc_value = self.__get_adc_value()
+                self.__data.append([self.__elapsed_time, adc_value])
                 time.sleep(self.__sampling_period)
                 i = i + 1
             self.__elapsed_time = time.time() - start_time
