@@ -5,7 +5,7 @@ import threading
 class Acquisition(threading.Thread):
     '''This class represents an acquisition object'''
 
-    def __init__(self, sampling_rate=1, channel=0, max_count=60):
+    def __init__(self, sampling_rate=1, channel=0, max_count=0):
         threading.Thread.__init__(self)
         self.__sampling_rate = sampling_rate
         self.__sampling_period = 1.0/sampling_rate
@@ -30,22 +30,25 @@ class Acquisition(threading.Thread):
     def get_channel(self):
         return self.__channel
 
+    def set_max_count(self, max_count):
+        self.__max_count = max_count
+    
+    def get_max_count(self):
+        return self.__max_count
+
 #    def start(self):
     def run(self):
-        try:
             self.__spi.open(0, 0)
             self.__status = 'running'
             start_time = time.time()
             i = 0
-            while self.__running and i < self.__max_count:
+            while self.__running and (self.__max_count == 0 or i < self.__max_count):
                 self.__elapsed_time = time.time() - start_time
                 adc_value = self.__get_adc_value()
                 self.__data.append([self.__elapsed_time, adc_value])
                 time.sleep(self.__sampling_period)
                 i = i + 1
             self.__elapsed_time = time.time() - start_time
-        except KeyboardInterrupt:
-            self.__spi.close()
 
     def stop(self):
         self.__running = False
