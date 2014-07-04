@@ -49,11 +49,11 @@ class Acquisition(threading.Thread):
                 time.sleep(self.__sampling_period)
                 i = i + 1
             self.__elapsed_time = time.time() - start_time
+            self.__spi.close()
+            self.__status = 'stopped'
 
     def stop(self):
         self.__running = False
-        self.__status = 'stopped'
-        self.__spi.close()
 
     def get_data(self):
         return self.__data
@@ -63,6 +63,10 @@ class Acquisition(threading.Thread):
     
     def get_elapsed_time(self):
         return self.__elapsed_time
+
+    def print_data(self):
+        for [elapsed_time, adc_value] in self.__data:
+            print elapsed_time, adc_value
 
     def __get_adc_value(self):
         # MCP3008
