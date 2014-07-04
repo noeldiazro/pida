@@ -5,10 +5,13 @@ import threading
 class Acquisition(threading.Thread):
     '''This class represents an acquisition object'''
 
-    def __init__(self, sampling_rate=1, channel=0, max_count=0):
+    def __init__(self, sampling_rate=0, channel=0, max_count=0):
         threading.Thread.__init__(self)
         self.__sampling_rate = sampling_rate
-        self.__sampling_period = 1.0/sampling_rate
+        if sampling_rate != 0:
+            self.__sampling_period = 1.0/sampling_rate
+        else:
+            self.__sampling_period = 0
         self.__channel = channel
         self.__max_count = max_count
         self.__data = []
@@ -39,6 +42,7 @@ class Acquisition(threading.Thread):
 #    def start(self):
     def run(self):
             self.__spi.open(0, 0)
+            self.__spi.max_speed_hz = 1000000
             self.__status = 'running'
             start_time = time.time()
             i = 0
