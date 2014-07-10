@@ -131,12 +131,14 @@ int main(int argc, char* argv[])
     printf("You must run test as super user\n");
     return 0;
   }
-  
-  /*  struct sched_param sp;
-  memset(&sp, 0, sizeof(sp));
-  sp.sched_priority = sched_get_priority_max(SCHED_FIFO);
-  sched_setscheduler(0, SCHED_FIFO, &sp);
-  mlockall(MCL_CURRENT | MCL_FUTURE); */
+
+  if (atoi(argv[1]) == 1) {
+    struct sched_param sp;
+    memset(&sp, 0, sizeof(sp));
+    sp.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    sched_setscheduler(0, SCHED_FIFO, &sp);
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+  }
   
   printf("Sleep time (ms)\t"
 	 "Sampling Rate (Hz)\t"
