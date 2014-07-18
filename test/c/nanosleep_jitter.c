@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include "tsop.h"
+#include <math.h>
 
 #define INNER_LOOP 1000
 
@@ -37,6 +38,29 @@ void test1(struct timespec sleep_time, int n_iter, struct timespec result[][2])
   clock_gettime(CLOCK_MONOTONIC, &result[n_iter][0]);
 }
 
+void test2(struct timespec sleep_time, int n_iter, struct timespec result[][2])
+{
+  int i = 0;
+  struct timespec request;
+  struct sched_param sp;
+
+  memset(&sp, 0, sizeof(sp));
+  sp.sched_priority = sched_get_priority_max(SCHED_FIFO);
+  sched_setscheduler(0, SCHED_FIFO, &sp);
+  mlockall(MCL_CURRENT | MCL_FUTURE);
+
+  for (i = 0; i < n_iter; i++)
+    {
+      clock_gettime(CLOCK_MONOTONIC, &result[i][0]);
+      request = ts_add(result[i][0], sleep_time);
+      result[i][1] = request;
+
+      clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &request, NULL);
+    }
+  
+  clock_gettime(CLOCK_MONOTONIC, &result[n_iter][0]);
+}
+
 int main(int argc, char* argv[])
 {
   int i = 0;
@@ -57,51 +81,71 @@ int main(int argc, char* argv[])
 
   struct timespec sleep_time;
 
-  float min, max, diff;
+  float min, max, diff, mean, variance, total;
   struct timespec expected_iter_time;
   struct timespec tested_iter_time;
 
-  struct timespec nano_time[INNER_LOOP + 1][2];
+  struct timespec result[INNER_LOOP + 1][2];
+
 
   if (geteuid() != 0) {
     printf("You must run test as super user\n");
     return 0;
   }
   
-  printf("Sleep time (ms)\t"
-	 "Sampling Rate (Hz)\t"
-	 "Expected Time (s)\t"
-	 "Elapsed Time (s)\t"
-	 "Total Deviation (ms)\t"
-	 "Total error (%%)\t"
-	 "Min Deviation (us)\t"
-	 "Min error (%%)\t"
-	 "Max Deviation (us)\t"
-	 "Max error (%%)\n");
+  printf("     Sleep time (ms)"
+	 "  Sampling Rate (Hz)"
+	 "   Expected Time (s)"
+	 "    Elapsed Time (s)"
+	 "Total Deviation (ms)"
+	 "     Total error (%%)"
+	 "  Min Deviation (us)"
+	 "       Min error (%%)"
+	 "  Max Deviation (us)"
+	 "       Max error (%%)"
+	 "           Mean (us)"
+	 "            Variance\n");
 
   for (i = 0; i < (sizeof(sleep_time_array) / sizeof(sleep_time_array[0])); i++)
     {
       sleep_time = sleep_time_array[i];
+
+      test2(sleep_time, INNER_LOOP, result);
+      
+      /* Process test  results */
       expected_iter_time = ts_scalar_product(sleep_time, INNER_LOOP);
 
-      test1(sleep_time, INNER_LOOP, nano_time);
-      
       /* Calculate minimum and maximum oversleeping */
-      min = (ts_to_ns(ts_subtract(nano_time[1][0], nano_time[0][0])) - ts_to_ns(sleep_time)) / NS_PER_US;
+      min = (ts_to_ns(ts_subtract(result[1][0], result[0][0])) - ts_to_ns(sleep_time)) / NS_PER_US;
       max = min;
 
       for (j = 1; j < INNER_LOOP; j++)
 	{
-	  diff = (ts_to_ns(ts_subtract(nano_time[j + 1][0], nano_time[j][0])) - ts_to_ns(sleep_time)) / NS_PER_US;
+	  diff = (ts_to_ns(ts_subtract(result[j + 1][0], result[j][0])) - ts_to_ns(sleep_time)) / NS_PER_US;
 
 	  min = min > diff ? diff : min;
 	  max = max < diff ? diff : max;
 	}
       
       /* Calculate iteration elapsed time */
-      tested_iter_time = ts_subtract(nano_time[INNER_LOOP][0], nano_time[0][0]);
+      tested_iter_time = ts_subtract(result[INNER_LOOP][0], result[0][0]);
 
-      printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.2f\t%.3f\t%.2f\t%.3f\t%.2f\n",
+      /* Mean and variance */
+      total = 0;
+      for (j = 0; j < INNER_LOOP; j++) {
+	diff = (ts_to_ns(ts_subtract(result[j + 1][0], result[j][0])) - ts_to_ns(sleep_time)) / NS_PER_US;
+	total += diff;
+      }
+      mean = total / INNER_LOOP;
+
+      total = 0;
+      for (j = 0; j < INNER_LOOP; j++) {
+	diff = (ts_to_ns(ts_subtract(result[j + 1][0], result[j][0])) - ts_to_ns(sleep_time)) / NS_PER_US;
+	total += pow(diff-mean, 2);
+      }
+      variance = total / INNER_LOOP;
+
+      printf("%20.3f%20.3f%20.3f%20.3f%20.3f%20.2f%20.3f%20.2f%20.3f%20.2f%20.3f%20.3f\n",
 	     ts_to_ms(sleep_time),
 	     1/ts_to_s(sleep_time),
 	     ts_to_s(expected_iter_time), 
@@ -111,7 +155,9 @@ int main(int argc, char* argv[])
 	     min,
 	     min/ts_to_us(sleep_time)*100,
 	     max,
-	     max/ts_to_us(sleep_time)*100);
+	     max/ts_to_us(sleep_time)*100,
+	     mean,
+	     variance);
     }
 
   return 0;
