@@ -1,4 +1,5 @@
 #include "tsop.h"
+#include <math.h>
 
 struct timespec ts_create(long s, long ns) {
   struct timespec result;
@@ -79,4 +80,14 @@ struct timespec ts_scalar_product (struct timespec ts, int factor) {
   }
 
   return result;
+}
+
+struct timespec double_to_ts(double t) {
+  long sec;
+  long nsec;
+
+  sec = (long)floor(t);
+  nsec = (long)((t-sec)*NS_PER_S);
+  
+  return ts_create(sec, nsec);
 }

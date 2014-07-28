@@ -19,3 +19,5 @@ struct  timespec  ts_add (struct  timespec, struct  timespec);
 struct  timespec  ts_subtract (struct  timespec, struct  timespec);
 
 struct timespec ts_scalar_product (struct timespec, int);
+
+struct timespec double_to_ts(double);

@@ -1,4 +1,4 @@
-import time
+import clock
 import spidev
 import threading
 
@@ -41,22 +41,25 @@ class Acquisition(threading.Thread):
 
 #    def start(self):
     def run(self):
-            self.__spi.open(0, 0)
-            self.__spi.max_speed_hz = 1000000
-            self.__status = 'running'
-#            start_time = time.time()
-            i = 0
-            while self.__running and (self.__max_count == 0 or i < self.__max_count):
-                if i == 0:
-                    start_time = time.time()
-                self.__elapsed_time = time.time() - start_time
-                adc_value = self.__get_adc_value()
-                self.__data.append([self.__elapsed_time, adc_value])
-                time.sleep(self.__sampling_period)
-                i = i + 1
-            self.__elapsed_time = time.time() - start_time
-            self.__spi.close()
-            self.__status = 'stopped'
+        self.__spi.open(0, 0)
+        self.__spi.max_speed_hz = 1000000
+        self.__status = 'running'
+#            start_time = clock.time()
+        i = 0
+        while self.__running and (self.__max_count == 0 or i < self.__max_count):
+            if i == 0:
+                start_time = clock.time()
+                request = start_time + self.__sampling_period
+            else:
+                request += self.__sampling_period
+            self.__elapsed_time = clock.time() - start_time
+            adc_value = self.__get_adc_value()
+            self.__data.append([self.__elapsed_time, adc_value])
+            clock.sleep(request)
+            i = i + 1
+        self.__elapsed_time = clock.time() - start_time
+        self.__spi.close()
+        self.__status = 'stopped'
 
     def stop(self):
         self.__running = False
