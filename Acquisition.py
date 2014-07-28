@@ -44,9 +44,11 @@ class Acquisition(threading.Thread):
             self.__spi.open(0, 0)
             self.__spi.max_speed_hz = 1000000
             self.__status = 'running'
-            start_time = time.time()
+#            start_time = time.time()
             i = 0
             while self.__running and (self.__max_count == 0 or i < self.__max_count):
+                if i == 0:
+                    start_time = time.time()
                 self.__elapsed_time = time.time() - start_time
                 adc_value = self.__get_adc_value()
                 self.__data.append([self.__elapsed_time, adc_value])
