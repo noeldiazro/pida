@@ -1,17 +1,16 @@
 from clock import time, sleep
 from threading import Thread
 from numbers import Number
-from interfaces import InputInterface
+from interfaces import Channel
 
 class Acquisition(Thread):
     '''This class represents an acquisition object'''
 
-    def __init__(self, sampling_rate=0, channel=0, max_count=0, interface=None):
+    def __init__(self, sampling_rate=0, channel=None, max_count=0):
         Thread.__init__(self)
         self.sampling_rate = sampling_rate
         self.channel = channel
         self.max_count = max_count
-        self.interface = interface
         self._data = []
         self._status = 'waiting'
         self._elapsed_time = 0.0
@@ -44,8 +43,8 @@ class Acquisition(Thread):
         return self._channel
     
     def set_channel(self, channel):
-        if not isinstance(channel, Number):
-            raise TypeError("Number expected")
+        if not isinstance(channel, Channel):
+            raise TypeError("Channel expected")
         self._channel = channel
 
     def del_channel(self):
@@ -69,21 +68,6 @@ class Acquisition(Thread):
         raise AttributeError("Can't delete attribute")
 
     max_count = property(get_max_count, set_max_count, del_max_count)
-
-    # Interface
-    @property
-    def interface(self):
-        return self._interface
-
-    @interface.setter
-    def interface(self, value):
-        if not isinstance(value, InputInterface):
-            raise TypeError("Interface expected")
-        self._interface = value
-
-    @interface.deleter
-    def interface(self):
-        raise AttributeError("Can't delete attribute")
 
     # Data
     def get_data(self, n_count=0):
@@ -110,8 +94,8 @@ class Acquisition(Thread):
 
 #    def start(self):
     def run(self):
-        # Open interface
-        self.interface.open() 
+        # Open channel
+        self.channel.open() 
         self._status = 'running'
 
         start_time = time()
@@ -123,7 +107,7 @@ class Acquisition(Thread):
 
             # Add new data poing
             self._elapsed_time = time() - start_time
-            value = self.interface.read(self.channel)
+            value = self.channel.read()
             self._data.append([self._elapsed_time, value])
             
             # Sleep till iteration end time
@@ -131,7 +115,7 @@ class Acquisition(Thread):
             i = i + 1
 
         self._elapsed_time = time() - start_time
-        self.interface.close()
+        self.channel.close()
         self._status = 'stopped'
 
     def stop(self):

@@ -1,7 +1,8 @@
-from .output_interface import OutputInterface
+from .dac import DAC
 import spidev
 
-class MCP4802(OutputInterface):
+class MCP4802(DAC):
+    '''This class manages MCP4802 Digital/Analog Converter operation'''
     def __init__(self):
         self._spi = spidev.SpiDev()
 

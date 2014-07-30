@@ -1,7 +1,7 @@
-from .input_interface import InputInterface
+from .adc import ADC
 import spidev
 
-class MCP3202(InputInterface):
+class MCP3202(ADC):
     def __init__(self):
         self._spi = spidev.SpiDev()
 

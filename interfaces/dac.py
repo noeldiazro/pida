@@ -1,16 +1,17 @@
 from abc import ABCMeta, abstractmethod
 
-class InputInterface:
+class DAC:
+    '''Abstract base class for classes that manage Digital/Analog converters operation'''
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def open(self):
-        print 1
+        pass
 
     @abstractmethod
     def close(self):
         pass
 
     @abstractmethod
-    def read(self, channel):
+    def write(self, value, channel):
         pass
