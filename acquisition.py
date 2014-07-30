@@ -1,17 +1,19 @@
 from clock import time, sleep
 from threading import Thread
 from numbers import Number
+from interfaces import Interface
 
 import spidev
 
 class Acquisition(Thread):
     '''This class represents an acquisition object'''
 
-    def __init__(self, sampling_rate=0, channel=0, max_count=0):
+    def __init__(self, sampling_rate=0, channel=0, max_count=0, interface=None):
         Thread.__init__(self)
         self.sampling_rate = sampling_rate
         self.channel = channel
         self.max_count = max_count
+        self.interface = interface
         self._data = []
         self._status = 'waiting'
         self._elapsed_time = 0.0
