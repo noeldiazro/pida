@@ -1,9 +1,7 @@
 from clock import time, sleep
 from threading import Thread
 from numbers import Number
-from interfaces import Interface
-
-import spidev
+from interfaces import InputInterface
 
 class Acquisition(Thread):
     '''This class represents an acquisition object'''
@@ -17,9 +15,8 @@ class Acquisition(Thread):
         self._data = []
         self._status = 'waiting'
         self._elapsed_time = 0.0
-        self._spi = spidev.SpiDev()
         self._running = True
-
+        
     # Sampling rate
     def get_sampling_rate(self):
         return self._sampling_rate
@@ -73,6 +70,21 @@ class Acquisition(Thread):
 
     max_count = property(get_max_count, set_max_count, del_max_count)
 
+    # Interface
+    @property
+    def interface(self):
+        return self._interface
+
+    @interface.setter
+    def interface(self, value):
+        if not isinstance(value, InputInterface):
+            raise TypeError("Interface expected")
+        self._interface = value
+
+    @interface.deleter
+    def interface(self):
+        raise AttributeError("Can't delete attribute")
+
     # Data
     def get_data(self, n_count=0):
         return self._data[-n_count:]
@@ -80,7 +92,7 @@ class Acquisition(Thread):
     data = property(get_data)
 
     def print_data(self, n_count=0):
-        print("Elapsed Time\tADC Value")
+        print("Elapsed Time\tValue")
         for [elapsed_time, adc_value] in self.get_data(n_count):
             print("{:.6f}".format(elapsed_time) + "\t" + str(adc_value))
 
@@ -98,39 +110,29 @@ class Acquisition(Thread):
 
 #    def start(self):
     def run(self):
-        self._spi.open(0, 0)
-        self._spi.max_speed_hz = 1000000
+        # Open interface
+        self.interface.open() 
         self._status = 'running'
-        i=0
+
         start_time = time()
         request = start_time
+        i=0
         while self._running and (self._max_count == 0 or i < self._max_count):
             # Calculate iteration end time
             request += self._sampling_period
 
             # Add new data poing
             self._elapsed_time = time() - start_time
-            adc_value = self._get_adc_value()
-            self._data.append([self._elapsed_time, adc_value])
+            value = self.interface.read(self.channel)
+            self._data.append([self._elapsed_time, value])
             
             # Sleep till iteration end time
             sleep(request)            
             i = i + 1
 
         self._elapsed_time = time() - start_time
-        self._spi.close()
+        self.interface.close()
         self._status = 'stopped'
 
     def stop(self):
         self._running = False
-
-    def _get_adc_value(self):
-        # MCP3008
-        #ret = self._spi.xfer2([1, (8 + self.get_channel()) << 4, 0])
-        #return ((ret[1]&3) << 8) + ret[2]
-        # MCP3002
-        #r = self._spi.xfer2([1,(2+self.get_channel()) << 6,0])
-        #return ((r[1]&31) << 6) + (r[2]>>2)
-        # MCP3202
-        r = self._spi.xfer2([1,(2+self.get_channel()) << 6,0])
-        return ((r[1] & 0b00001111) << 8) + r[2]

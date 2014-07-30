@@ -1,2 +1,3 @@
-from .interface import Interface
-from .first_interface import FirstInterface
+from .input_interface import InputInterface
+from .mcp3002 import MCP3002
+from .mcp3202 import MCP3202

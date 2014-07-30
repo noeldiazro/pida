@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-class Interface:
+class InputInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod
