@@ -1,5 +1,5 @@
 from clock import time, sleep
-from threading import Thread
+from threading import Thread, Lock
 from numbers import Number
 from interfaces import Channel
 
@@ -15,6 +15,7 @@ class Acquisition(Thread):
         self._status = 'waiting'
         self._elapsed_time = 0.0
         self._running = True
+        self.LOCK = Lock()  #For critical section locking
         
     # Sampling rate
     def get_sampling_rate(self):
