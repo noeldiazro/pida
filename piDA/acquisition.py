@@ -43,6 +43,7 @@ class Acquisition(Thread):
         return self._channel
     
     def set_channel(self, channel):
+        
         if not isinstance(channel, Channel):
             raise TypeError("Channel expected")
         self._channel = channel
