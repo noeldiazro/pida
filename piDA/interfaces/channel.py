@@ -1,10 +1,10 @@
 class Channel():
     '''This class representes a channel of an interface'''
 
-    def __init__(self, identifier, adc, channel):
+    def __init__(self, identifier, adc, adc_channel):
         self._identifier = identifier
         self._adc = adc
-        self._channel = channel
+        self._adc_channel = adc_channel
 
     @property
     def identifier(self):
@@ -17,4 +17,4 @@ class Channel():
         self._adc.close()
 
     def read(self):
-        return self._adc.read(self._channel)
+        return self._adc.read(self._adc_channel)

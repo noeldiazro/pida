@@ -15,6 +15,7 @@ class Acquisition(Thread):
         self._status = 'waiting'
         self._elapsed_time = 0.0
         self._running = True
+        self._start_time = 0.0
         self.LOCK = Lock()  #For critical section locking
         
     # Sampling rate
@@ -94,21 +95,26 @@ class Acquisition(Thread):
 
     elapsed_time = property(get_elapsed_time)
 
+    # Start Time
+    @property
+    def start_time(self):
+        return self._start_time
+
 #    def start(self):
     def run(self):
         # Open channel
         self.channel.open() 
         self._status = 'running'
 
-        start_time = time()
-        request = start_time
+        self._start_time = time()
+        request = self._start_time
         i=0
         while self._running and (self._max_count == 0 or i < self._max_count):
             # Calculate iteration end time
             request += self._sampling_period
 
             # Add new data poing
-            self._elapsed_time = time() - start_time
+            self._elapsed_time = time() - self._start_time
             value = self.channel.read()
             self._data.append([self._elapsed_time, value])
             
@@ -116,7 +122,7 @@ class Acquisition(Thread):
             sleep(request)            
             i = i + 1
 
-        self._elapsed_time = time() - start_time
+        self._elapsed_time = time() - self._start_time
         self.channel.close()
         self._status = 'stopped'
 
