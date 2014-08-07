@@ -17,7 +17,8 @@ class Acquisition(Thread):
         self._running = True
         self._start_time = 0.0
         self.LOCK = Lock()  #For critical section locking
-        
+        self.daemon = True
+
     # Sampling rate
     def get_sampling_rate(self):
         return self._sampling_rate
