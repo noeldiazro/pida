@@ -1,10 +1,10 @@
 from .interface import Interface
 from .channel import Channel
-from .mcp3202 import MCP3202
+from .adc import MCP3202
 
 class piDAInterface(Interface):
     def __init__(self):
-        adc0 = MCP3202()
+        adc0 = MCP3202(3.3)
         self._channel_list = [
             Channel(0, adc0, 0),
             Channel(1, adc0, 1)
