@@ -1,17 +1,16 @@
 from .interface import Interface
-from .channel import Channel
-from .adc import MCP3202
+from .input_channel import InputChannel
+from ..converters.mcp3202 import MCP3202
+from ..links.spi_data_link import SPIDataLink
 
 class piDAInterface(Interface):
     def __init__(self):
-        adc0 = MCP3202(3.3)
-        self._channel_list = [
-            Channel(0, adc0, 0),
-            Channel(1, adc0, 1)
+        identifier = "piDA Interface"
+        description = ""
+        link0 = SPIDataLink(0, 0, 1000000)
+        adc0 = MCP3202(3.3, link0)
+        channel_list = [
+            InputChannel(0, "", adc0, 0),
+            InputChannel(1, "", adc0, 1)
             ]
-
-    def get_channel_list(self):
-        return self._channel_list
-
-    def get_channel_by_id(self, identifier):
-        return self._channel_list[identifier]
+        Interface.__init__(self, identifier, description, channel_list)
