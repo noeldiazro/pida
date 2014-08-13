@@ -16,7 +16,11 @@ class Acquisition(Thread):
         self._elapsed_time = 0.0
         self._running = True
         self._start_time = 0.0
+        # Lock to access start_time
+        self.start_time_lock = Lock()
+        self.start_time_lock.acquire()
         self.LOCK = Lock()  #For critical section locking
+        
         self.daemon = True
 
     # Sampling rate
@@ -108,6 +112,8 @@ class Acquisition(Thread):
         self._status = 'running'
 
         self._start_time = time()
+        self.start_time_lock.release()
+
         request = self._start_time
         i=0
         while self._running and (self._max_count == 0 or i < self._max_count):
