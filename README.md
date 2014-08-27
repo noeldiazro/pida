@@ -1,4 +1,4 @@
 piDA
 ====
 
-Software para controlar el hardware de adquisición de datos piDA
+Software para controlar el hardware de adquisición de datos piDA.
