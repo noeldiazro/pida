@@ -13,7 +13,7 @@ setup(name='piDA',
         Extension('spidev', ['piDA/src/spidev_module.c'])
       ],
       data_files=[
-        ('/etc/modprobe.d',['piDA/config/raspi-blacklist.conf']),
-        ('/etc',['piDA/config/modules'])
+        ('/etc/modprobe.d',['config/raspi-blacklist.conf']),
+        ('/etc',['config/modules'])
         ]
 )
