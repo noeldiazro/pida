@@ -1,1 +1,1 @@
-Search.setIndex({objects:{},terms:{index:0,search:0,welcom:0,pida:0,modul:0,indic:0,content:0,tabl:0,document:0,page:0},objtypes:{},titles:["Welcome to piDA&#8217;s documentation!"],objnames:{},filenames:["index"]})
+Search.setIndex({objects:{},terms:{index:[],search:[],"b\u00fasqueda":0,welcom:[],bienvenido:0,pida:0,modul:[],"documentaci\u00f3n":0,indic:0,page:[],content:[],contenido:0,"p\u00e1gina":0,tabl:[],"m\u00f3dulo":0,document:[],tabla:0,"\u00edndice":0},objtypes:{},titles:["Bienvenido a la documentaci\u00f3n de piDA"],objnames:{},filenames:["index"]})
