@@ -9,6 +9,8 @@ References
 .. toctree::
    :maxdepth: 2
 
+   piDA
+
 Indices and tables
 ------------------
 
