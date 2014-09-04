@@ -1,22 +1,11 @@
-.. piDA documentation master file, created by
-   sphinx-quickstart on Thu Aug 28 08:57:25 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+#####################################
+Adquisición de datos con Raspberry Pi
+#####################################
 
-Bienvenido a la documentación de piDA
-=====================================
-
-Contenidos
+A continuación se describen los módulos que constituyen el *framework*
+de adquisición de datos mediante Raspberry Pi.
 
 .. toctree::
-   :maxdepth: 2
-
-
-
-Indices y tablas
-================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   :maxdepth: 3
+   
+   piDA

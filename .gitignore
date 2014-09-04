@@ -51,5 +51,15 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/_static/
 
 *.supported
+
+# Apple
+.AppleDouble/
+
+# Dropbox
+.DS_Store
+
+# Emacs autosaved files
+*~
