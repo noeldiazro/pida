@@ -3,6 +3,11 @@ Módulo :mod:`links`
 ===================
 .. module:: piDA.links
 
+Este módulo incluye clases para gestionar enlaces de datos.
+
+.. inheritance-diagram:: DataLink
+			 SPIDataLink
+
 Clase :class:`DataLink`
 -----------------------
 .. class:: DataLink(identifier, description, max_speed)

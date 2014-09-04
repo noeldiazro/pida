@@ -6,6 +6,16 @@ Módulo :mod:`piDA.interfaces`
 Este módulo incluye clases para gestionar interfaces de adquisición de
 datos.
 
+.. inheritance-diagram:: piDAInterface
+			 piDAInterface0
+			 Gertboard
+			 Interface
+			 InputChannel
+			 OutputChannel
+			 Channel
+   :parts: 1
+
+
 Clase :class:`Channel`
 ----------------------
 .. class:: Channel(identifier, description, converter, converter_channel)

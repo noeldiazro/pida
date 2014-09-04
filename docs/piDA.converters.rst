@@ -6,6 +6,14 @@ Módulo :mod:`piDA.converters`
 Este módulo incluye clases para gestionar convertidores de datos
 analógico/digitales y digital/analógicos.
 
+.. inheritance-diagram:: Converter
+			 ADC
+			 DAC
+			 MCP3002
+			 MCP3202
+			 MCP4802
+   :parts: 1
+
 Clase :class:`Converter`
 ------------------------
 .. class:: Converter(identifier, description, vref, bits, channels, data_link)
