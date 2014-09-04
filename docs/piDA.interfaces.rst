@@ -113,9 +113,53 @@ Clase :class:`Interface`
 
    Clase base: :class:`object`.
 
+   :param identifier: identificador de la interfaz.
+   :type identifier: :class:`String`
+   :param description: descripción de la interfaz.
+   :type description: :class:`String`
+   :param channel_list: lista de canales de la interfaz. Cada elemento
+                        de la lista es un objeto :class:`Channel`.
+   :type channel_list: :class:`List`
+
+   .. attribute:: channel_list
+
+      Lista de canales de la interfaz. Cada elemento de la lista es un
+      objeto :class:`Channel`.
+
+      Es una propiedad de sólo lectura.
+
+   .. attribute:: description
+
+      Descripción de la interfaz.
+
+      Es una propiedad de sólo lectura.
+
+   .. method:: get_channel_list()
+
+      Devuelve la lista de canales de la interfaz.
+
+      .. deprecated:: 1.0
+	 Use :attr:`channel_list` en su lugar.      
+
+   .. method:: get_channel_by_id(channel_identifier)
+
+      Busca en la lista de canales de la interfaz y devuelve el canal
+      que se corresponde con el identificador suministrado.
+
+      :param channel_identifier: identificador del canal a buscar.
+
+   .. attribute:: identifier
+
+      Identificador de la interfaz.
+
+      Es una propiedad de sólo lectura.
+
+
 Clase :class:`Gertboard`
 ------------------------
 .. class:: Gertboard()
+   
+   Clase para gestionar la interfaz de adquisición de datos Gertboard.
 
    Clase base: :class:`Interface`
 
@@ -123,10 +167,14 @@ Clase :class:`piDAInterface0`
 -----------------------------
 .. class:: piDAInterface0()
 
+   Clase para gestionar la interfaz de adquisición de datos piDAInterface 0.
+
    Clase base: :class:`Interface`
 
 Clase :class:`piDAInterface`
 ----------------------------
 .. class:: piDAInterface()
+
+   Clase para gestionar la interfaz de adquisición de datos piDAInterface.
 
    Clase base: :class:`Interface`
