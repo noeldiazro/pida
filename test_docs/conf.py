@@ -17,6 +17,7 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+sys.path[:0] = [os.path.abspath('.'), os.path.abspath('..')]
 
 # -- General configuration -----------------------------------------------------
 
@@ -64,7 +65,7 @@ release = '0.0.1'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '.AppleDouble']
+exclude_patterns = ['_build', '.AppleDouble', 'piDA/.AppleDouble']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None

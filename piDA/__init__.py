@@ -5,7 +5,14 @@
 from abc import ABCMeta
 
 class piDAObject(object):
-    """Abstract base class for all objects in :mod:`piDA` library."""
+    """Abstract base class for all objects in :mod:`piDA` library.
+
+    :param identifier: identifier of the object
+    :type identifier: :class:`String`
+    :param description: description of the object
+    :type description: :class:`String`
+
+    """
     __metaclass__ = ABCMeta
 
     def __init__(self, identifier="", description=""):

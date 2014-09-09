@@ -2,12 +2,12 @@
 
 from distutils.core import setup, Extension
 setup(name='piDA',
-      version='1.0',
+      version='2.0',
       description='Data acquisition management software',
       author='Noel Diaz',
       author_email='noeldiazro@gmail.com',
       url='http://github.com/noeldiazro/piDA',
-      packages=['piDA','piDA.interfaces','piDA.converters','piDA.links'],
+      packages=['piDA'],
       ext_modules=[
         Extension('clock', ['piDA/src/pyclock.c', 'piDA/src/tsop.c'], libraries=['rt']),
         Extension('spidev', ['piDA/src/spidev_module.c'])

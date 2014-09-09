@@ -52,6 +52,8 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 docs/_static/
+test_docs/_build
+test_docs/_static
 
 *.supported
 
