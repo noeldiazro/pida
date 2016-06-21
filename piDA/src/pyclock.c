@@ -2,6 +2,10 @@
 #include "tsop.h"
 #include <stdio.h>
 
+PyDoc_STRVAR(py_time_doc,
+	     "time() \n\n"
+	     "Return current instant.\n");
+
 /* Returns a timespec with the current value of CLOCK_MONOTONIC */
 static PyObject *py_time(PyObject *self, PyObject *args) {
   struct timespec result;
@@ -12,6 +16,11 @@ static PyObject *py_time(PyObject *self, PyObject *args) {
 
   return Py_BuildValue("d", ts_to_s(result));
 } 
+
+
+PyDoc_STRVAR(py_sleep_doc,
+	     "sleep(sleep_time)\n\n"
+	     "Sleep specified interval\n");
 
 static PyObject *py_sleep(PyObject *self, PyObject *args) {
   struct timespec request;
@@ -33,15 +42,22 @@ static PyObject *py_sleep(PyObject *self, PyObject *args) {
 
 /* Module method table */
 static PyMethodDef clock_methods[] = {
-  {"time", py_time, METH_VARARGS, "Returns current instant."},
-  {"sleep", py_sleep, METH_VARARGS, "Sleeps specified duration"},
+  {"time", py_time, METH_VARARGS, py_time_doc},
+  {"sleep", py_sleep, METH_VARARGS, py_sleep_doc},
   {NULL, NULL, 0, NULL}
 };
+
+PyDoc_STRVAR(clock_module_doc,
+	     ":mod:`clock`\n"
+	     "~~~~~~~~~~~~\n"
+	     "\n"
+	     "High-performance clocking.\n");
+
 
 /* Module initialization function */
 PyMODINIT_FUNC initclock(void)
 {
-  PyObject *m = Py_InitModule3("clock", clock_methods, "High-performance clocking.");
+  PyObject *m = Py_InitModule3("clock", clock_methods, clock_module_doc);
   if (m == NULL)
     return;
 }
