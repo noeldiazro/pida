@@ -1,19 +1,38 @@
 #!/usr/bin/env python
+"""
+pida
+----
 
-from distutils.core import setup, Extension
-setup(name='piDA',
-      version='2.0',
-      description='Data acquisition management software',
-      author='Noel Diaz',
-      author_email='noeldiazro@gmail.com',
-      url='http://github.com/noeldiazro/piDA',
-      packages=['piDA'],
-      ext_modules=[
-        Extension('clock', ['piDA/src/pyclock.c', 'piDA/src/tsop.c'], libraries=['rt']),
-        Extension('spidev', ['piDA/src/spidev_module.c'])
-      ],
-      data_files=[
-        ('/etc/modprobe.d',['config/raspi-blacklist.conf']),
-        ('/etc',['config/modules'])
-        ]
+pida is a library to manage data acquisition hardware
+from Raspberry Pi
+"""
+from setuptools import setup
+
+setup(
+    name='pida',
+    version='0.1',
+    url='https://github.com/noeldiazro/piDA',
+    license='BSD',
+    description='Data acquisition management software',
+    long_description=__doc__,
+    author='Noel Diaz Rodriguez',
+    author_email='noeldiazro@gmail.com',
+    packages=['pida'],
+    include_package_data=True,
+    install_requires=[
+        'spidev'
+    ],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+    ]
+    #ext_modules=[
+    #    Extension('clock', ['piDA/src/pyclock.c', 'piDA/src/tsop.c'], libraries=['rt']),
+    #    Extension('spidev', ['piDA/src/spidev_module.c'])
+    #],
+    #data_files=[
+    #    ('/etc/modprobe.d',['config/raspi-blacklist.conf']),
+    #    ('/etc',['config/modules'])
+    #]
 )
+
+__author__ = 'Noel Diaz Rodriguez'
