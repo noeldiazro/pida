@@ -4,12 +4,10 @@
 """
 from abc import ABCMeta, abstractmethod
 from threading import Thread, Lock
-from piDA import piDAObject
 from numbers import Number
-from piDA.interfaces import Channel
 from clock import time, sleep
 
-class Acquisition(Thread, piDAObject):
+class Acquisition(Thread):
     """Abstract base class for classes that represent a data acquisition.
 
     :param channel: the channel of an interface to acquire data from
@@ -24,9 +22,10 @@ class Acquisition(Thread, piDAObject):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, channel=None, max_count=0, identifier=0, description=""):
+    def __init__(self, channel=None, max_count=0):
         Thread.__init__(self)
-        piDAObject.__init__(self, identifier, description)
+        self._channel = None
+        self._max_count = 0
         self.channel = channel
         self.max_count = max_count
         self._data = []
@@ -39,7 +38,6 @@ class Acquisition(Thread, piDAObject):
         """."""
 
         self.start_time_lock.acquire()
-        
         self.daemon = True
 
     # Channel
@@ -47,11 +45,9 @@ class Acquisition(Thread, piDAObject):
     def channel(self):
         """."""
         return self._channel
-    
+
     @channel.setter
     def channel(self, channel):
-        if not isinstance(channel, Channel):
-            raise TypeError("Channel expected")
         self._channel = channel
 
     @channel.deleter
@@ -66,13 +62,10 @@ class Acquisition(Thread, piDAObject):
 
     @max_count.setter
     def max_count(self, max_count):
-        if not isinstance(max_count, Number):
-            raise TypeError("Number expected")
-        if max_count >= 0:
-            self._max_count = int(max_count)
-        else:
-            raise TypeError("Positive number expected")
-    
+        if max_count < 0:
+            raise ValueError("Positive number expected")
+        self._max_count = int(max_count)
+
     @max_count.deleter
     def max_count(self):
         raise AttributeError("Can't delete attribute")
@@ -84,16 +77,16 @@ class Acquisition(Thread, piDAObject):
 
     def print_data(self, n_count=0):
         """."""
-        print("Elapsed Time\tValue")
+        print "Elapsed Time\tValue"
         for [elapsed_time, adc_value] in self.get_data(n_count):
-            print("{:.6f}".format(elapsed_time) + "\t" + str(adc_value))
+            print "{:.6f}".format(elapsed_time) + "\t" + str(adc_value)
 
     # Status
     @property
     def status(self):
         """."""
         return self._status
-    
+
     # Elapsed Time
     @property
     def elapsed_time(self):
@@ -133,6 +126,8 @@ class SynchronousAcquisition(Acquisition):
 
     def __init__(self, channel=None, max_count=0, sampling_rate=0, identifier=0, description=""):
         Acquisition.__init__(self, channel, max_count, identifier, description)
+        self._sampling_rate = 0.0
+        self._sampling_period = 0.0
         self.sampling_rate = sampling_rate
 
     # Sampling rate
@@ -162,14 +157,14 @@ class SynchronousAcquisition(Acquisition):
     def run(self):
         """."""
         # Open channel
-        self.channel.open() 
+        self.channel.open()
         self._status = 'running'
 
         self._start_time = time()
         self.start_time_lock.release()
 
         request = self._start_time
-        i=0
+        i = 0
         while self._running and (self._max_count == 0 or i < self._max_count):
             # Calculate iteration end time
             request += self._sampling_period
@@ -178,9 +173,9 @@ class SynchronousAcquisition(Acquisition):
             self._elapsed_time = time() - self._start_time
             value = self.channel.read()
             self._data.append([self._elapsed_time, value])
-            
+
             # Sleep till iteration end time
-            sleep(request)            
+            sleep(request)
             i = i + 1
 
         self._elapsed_time = time() - self._start_time

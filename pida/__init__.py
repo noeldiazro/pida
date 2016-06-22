@@ -4,7 +4,7 @@
 """
 from abc import ABCMeta
 
-class piDAObject(object):
+class PidaObject(object):
     """Abstract base class for all objects in :mod:`piDA` library.
 
     :param identifier: identifier of the object

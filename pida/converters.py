@@ -3,9 +3,9 @@
 
 """
 from abc import ABCMeta, abstractmethod, abstractproperty
-from piDA import piDAObject
+from pida import PidaObject
 
-class Converter(piDAObject):
+class Converter(PidaObject):
     """Abstract base class for classes that manage data converters.
 
     :param vref: reference voltage of the converter
@@ -21,10 +21,10 @@ class Converter(piDAObject):
     __metaclass__ = ABCMeta
 
     def __init__(self, vref, data_link, identifier=0, description=""):
-        piDAObject.__init__(self, identifier, description)
+        PidaObject.__init__(self, identifier, description)
         self._vref = vref * 1.0
         self._data_link = data_link
-        
+
     def open(self):
         """Open communication with the converter. Call this method
         before reading/writing from/to the converter.
@@ -150,7 +150,7 @@ class DAC(Converter):
 
     def __init__(self, vref, data_link, identifier=0, description=""):
         Converter.__init__(self, vref, data_link, identifier, description)
-        self._factor = self.levels / self._vref  
+        self._factor = self.levels / self._vref
 
     @abstractmethod
     def write_code(self, value, channel):
@@ -183,7 +183,7 @@ class MCP3002(ADC):
     :param vref: reference voltage of the converter
     :type vref: :class:`Number`
     :param data_link: data link used to communicate with the converter
-    :type data_link: :class:`piDA.links.DataLink`    
+    :type data_link: :class:`piDA.links.DataLink`
     :param identifier: identifier of the converter
     :type identifier: :class:`Integer`
     :param description: description of the converter
@@ -218,8 +218,8 @@ class MCP3002(ADC):
         :type channel: :class:`Integer`
 
         """
-        r = self._data_link.transfer([1,(2+channel) << 6,0])
-        return ((r[1] & 0b00011111) << 6) + (r[2]>>2)
+        result = self._data_link.transfer([1, (2+channel) << 6, 0])
+        return ((result[1] & 0b00011111) << 6) + (result[2]>>2)
 
 class MCP3202(ADC):
     """Class that manages Microchip's MCP3202 Analog-to-Digital converter.
@@ -227,7 +227,7 @@ class MCP3202(ADC):
     :param vref: reference voltage of the converter
     :type vref: :class:`Number`
     :param data_link: data link used to communicate with the converter
-    :type data_link: :class:`piDA.links.DataLink`    
+    :type data_link: :class:`piDA.links.DataLink`
     :param identifier: identifier of the converter
     :type identifier: :class:`Integer`
     :param description: description of the converter
@@ -262,8 +262,8 @@ class MCP3202(ADC):
         :type channel: :class:`Integer`
 
         """
-        r = self._data_link.transfer([1,(2+channel) << 6,0])
-        return ((r[1] & 0b00001111) << 8) + r[2]
+        result = self._data_link.transfer([1, (2+channel) << 6, 0])
+        return ((result[1] & 0b00001111) << 8) + result[2]
 
 class MCP4802(DAC):
     """Class that manages Microchip's MCP4802 Digital-to-Analog converter.
@@ -309,7 +309,7 @@ class MCP4802(DAC):
         :type channel: :class:`Integer`
 
         """
-        
-        b1 = (channel << 7) + (0b011 << 4) + (value >> 4)
-        b2 = (value << 4) & 0xFF
-        r = self._data_link.transfer([b1, b2])
+
+        byte1 = (channel << 7) + (0b011 << 4) + (value >> 4)
+        byte2 = (value << 4) & 0xFF
+        self._data_link.transfer([byte1, byte2])

@@ -3,11 +3,11 @@
 
 """
 from abc import ABCMeta
-from piDA import piDAObject
-from piDA.converters import MCP3002, MCP3202, MCP4802
-from piDA.links import SPIDataLink
+from pida import PidaObject
+from pida.converters import MCP3002, MCP3202, MCP4802
+from pida.links import SPIDataLink
 
-class Channel(piDAObject):
+class Channel(PidaObject):
     """Class to define a channel of a data acquisition interface.
 
     :param identifier: identifier of the channel
@@ -24,8 +24,7 @@ class Channel(piDAObject):
     __metaclass__ = ABCMeta
 
     def __init__(self, identifier, description, converter, converter_channel):
-        self._identifier = identifier
-        self._description = description
+        PidaObject.__init__(identifier, description)
         self._converter = converter
         self._converter_channel = converter_channel
 
@@ -37,7 +36,7 @@ class Channel(piDAObject):
 
         """
         return self._converter
-    
+
     @property
     def converter_channel(self):
         """.
@@ -67,8 +66,8 @@ class InputChannel(Channel):
     :param converter_channel: data converter channel associated with
        the channel
     :type converter_channel: :class:`Integer`
-    
-    """    
+
+    """
     def __init__(self, identifier, description, converter, converter_channel):
         Channel.__init__(self, identifier, description, converter, converter_channel)
 
@@ -97,21 +96,20 @@ class OutputChannel(Channel):
         """."""
         return self._converter.write(value, self._converter_channel)
 
-class Interface(piDAObject):
+class Interface(PidaObject):
     """Abstract base class for classes that manage data acquisition interfaces operation.
 
     :param identifier: identifier of the channel
     :type identifier: :class:`String`
     :param description: description of the channel
     :type description: :class:`String`
-    :param channel_list: 
+    :param channel_list:
     :type channel_list:
     """
     __metaclass__ = ABCMeta
 
     def __init__(self, identifier, description, channel_list):
-        self._identifier = identifier
-        self._description = description
+        PidaObject.__init__(identifier, description)
         self._channel_list = channel_list
 
     @property
@@ -138,9 +136,9 @@ class Interface(piDAObject):
         """."""
         return self._channel_list[channel_identifier]
 
-class piDAInterface(Interface):
+class PidaInterface(Interface):
     """Definition of interface 'piDA Interface 1'."""
-    def __init__(self): 
+    def __init__(self):
         identifier = "piDA Interface 1"
         description = ""
         link0 = SPIDataLink("", "", 100000, 0, 0)
@@ -155,7 +153,7 @@ class piDAInterface(Interface):
             ]
         Interface.__init__(self, identifier, description, channel_list)
 
-class piDAInterface0(Interface):
+class PidaInterface0(Interface):
     """Definition of interface 'piDA Interface 0'."""
     def __init__(self):
         identifier = "piDA Interface 0"

@@ -3,10 +3,10 @@
 
 """
 from abc import ABCMeta, abstractmethod
-from piDA import piDAObject
+from pida import PidaObject
 from spidev import SpiDev
 
-class DataLink(piDAObject):
+class DataLink(PidaObject):
     """Abstract base class for data link definitions.
 
     :param max_speed: maximum speed (hertzs) of the data link
@@ -20,7 +20,7 @@ class DataLink(piDAObject):
     __metaclass__ = ABCMeta
 
     def __init__(self, max_speed, identifier=0, description=""):
-        piDAObject.__init__(self, identifier, description)
+        PidaObject.__init__(self, identifier, description)
         self.max_speed = max_speed
         """Maximum speed in hertzs of the data link."""
 
@@ -38,9 +38,9 @@ class DataLink(piDAObject):
     def close(self):
         """Close data link. Call this method after all transferences
         have been performed.
-        
+
         .. warning:: Abstract method.
-        
+
         """
         pass
 
@@ -115,6 +115,6 @@ class SPIDataLink(DataLink):
 
         :param data: data (bytes) to send.
         :type data: :class:`List`
-        
+
         """
         return self._spi.xfer2(data)
