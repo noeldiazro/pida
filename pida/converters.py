@@ -3,9 +3,8 @@
 
 """
 from abc import ABCMeta, abstractmethod, abstractproperty
-from pida import PidaObject
 
-class Converter(PidaObject):
+class Converter:
     """Abstract base class for classes that manage data converters.
 
     :param vref: reference voltage of the converter
@@ -20,8 +19,7 @@ class Converter(PidaObject):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, vref, data_link, identifier=0, description=""):
-        PidaObject.__init__(self, identifier, description)
+    def __init__(self, vref, data_link):
         self._vref = vref * 1.0
         self._data_link = data_link
 
@@ -108,8 +106,8 @@ class ADC(Converter):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, vref, data_link, identifier=0, description=""):
-        Converter.__init__(self, vref, data_link, identifier, description)
+    def __init__(self, vref, data_link):
+        Converter.__init__(self, vref, data_link)
         self._factor = self._vref / self.levels
 
     @abstractmethod
@@ -190,8 +188,8 @@ class MCP3002(ADC):
     :type description: :class:`String`
 
     """
-    def __init__(self, vref, data_link=None, identifier=0, description=""):
-        ADC.__init__(self, vref, data_link, identifier, description)
+    def __init__(self, vref, data_link=None):
+        ADC.__init__(self, vref, data_link)
 
     @property
     def bits(self):
@@ -234,8 +232,8 @@ class MCP3202(ADC):
     :type description: :class:`String`
 
     """
-    def __init__(self, vref, data_link=None, identifier=0, description=""):
-        ADC.__init__(self, vref, data_link, identifier, description)
+    def __init__(self, vref, data_link=None):
+        ADC.__init__(self, vref, data_link)
 
     @property
     def bits(self):
@@ -279,8 +277,8 @@ class MCP4802(DAC):
 
     """
 #    def __init__(self, vref=2.048, data_link):
-    def __init__(self, vref, data_link=None, identifier=0, description=""):
-        DAC.__init__(self, vref, data_link, identifier, description)
+    def __init__(self, vref, data_link=None):
+        DAC.__init__(self, vref, data_link)
 
     @property
     def bits(self):

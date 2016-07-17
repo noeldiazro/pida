@@ -4,7 +4,6 @@
 """
 from abc import ABCMeta, abstractmethod
 from threading import Thread, Lock
-from numbers import Number
 from clock import time, sleep
 
 class Acquisition(Thread):
@@ -116,7 +115,6 @@ class SynchronousAcquisition(Acquisition):
     :param max_count: maximum number of data samples to take
     :type max_count: :class:`Integer`
     :param sampling_rate: sampling rate of the acquisition
-    :type sampling_rate: :class:`Number`
     :param identifier: identifier of the data acquisition
     :type identifier: :class:`Integer`
     :param description: description of the data acquisition
@@ -124,8 +122,8 @@ class SynchronousAcquisition(Acquisition):
 
     """
 
-    def __init__(self, channel=None, max_count=0, sampling_rate=0, identifier=0, description=""):
-        Acquisition.__init__(self, channel, max_count, identifier, description)
+    def __init__(self, channel=None, max_count=0, sampling_rate=0):
+        Acquisition.__init__(self, channel, max_count)
         self._sampling_rate = 0.0
         self._sampling_period = 0.0
         self.sampling_rate = sampling_rate
@@ -138,9 +136,6 @@ class SynchronousAcquisition(Acquisition):
 
     @sampling_rate.setter
     def sampling_rate(self, sampling_rate):
-        if not isinstance(sampling_rate, Number):
-            raise TypeError("Number expected")
-
         if sampling_rate > 0:
             self._sampling_rate = 1.0 * sampling_rate
             self._sampling_period = 1.0 / sampling_rate

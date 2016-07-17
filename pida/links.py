@@ -3,10 +3,9 @@
 
 """
 from abc import ABCMeta, abstractmethod
-from pida import PidaObject
 from spidev import SpiDev
 
-class DataLink(PidaObject):
+class DataLink:
     """Abstract base class for data link definitions.
 
     :param max_speed: maximum speed (hertzs) of the data link
@@ -19,8 +18,7 @@ class DataLink(PidaObject):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, max_speed, identifier=0, description=""):
-        PidaObject.__init__(self, identifier, description)
+    def __init__(self, max_speed):
         self.max_speed = max_speed
         """Maximum speed in hertzs of the data link."""
 
@@ -72,8 +70,8 @@ class SPIDataLink(DataLink):
     :type description: :class:`String`
 
     """
-    def __init__(self, max_speed, bus, device, identifier=0, description=""):
-        DataLink.__init__(self, max_speed, identifier, description)
+    def __init__(self, max_speed, bus, device):
+        DataLink.__init__(self, max_speed)
         self._bus = bus
         self._device = device
         self._spi = SpiDev()

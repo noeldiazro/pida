@@ -3,17 +3,12 @@
 
 """
 from abc import ABCMeta
-from pida import PidaObject
 from pida.converters import MCP3002, MCP3202, MCP4802
 from pida.links import SPIDataLink
 
-class Channel(PidaObject):
+class Channel:
     """Class to define a channel of a data acquisition interface.
 
-    :param identifier: identifier of the channel
-    :type identifier: :class:`String`
-    :param description: description of the channel
-    :type description: :class:`String`
     :param converter: data converter associated with the channel
     :type converter: :class:`piDA.converters.Converter`
     :param converter_channel: data converter channel associated with
@@ -23,8 +18,7 @@ class Channel(PidaObject):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, identifier, description, converter, converter_channel):
-        PidaObject.__init__(identifier, description)
+    def __init__(self, converter, converter_channel):
         self._converter = converter
         self._converter_channel = converter_channel
 
@@ -57,19 +51,14 @@ class Channel(PidaObject):
 class InputChannel(Channel):
     """Class that manages an input channel of an interface.
 
-    :param identifier: identifier of the channel
-    :type identifier: :class:`String`
-    :param description: description of the channel
-    :type description: :class:`String`
     :param converter: data converter associated with the channel
     :type converter: :class:`piDA.converters.Converter`
     :param converter_channel: data converter channel associated with
        the channel
     :type converter_channel: :class:`Integer`
-
     """
-    def __init__(self, identifier, description, converter, converter_channel):
-        Channel.__init__(self, identifier, description, converter, converter_channel)
+    def __init__(self, converter, converter_channel):
+        Channel.__init__(self, converter, converter_channel)
 
     def read(self):
         """."""
@@ -78,10 +67,6 @@ class InputChannel(Channel):
 class OutputChannel(Channel):
     """Class that manages an output channel of an interface.
 
-    :param identifier: identifier of the channel
-    :type identifier: :class:`String`
-    :param description: description of the channel
-    :type description: :class:`String`
     :param converter: data converter associated with the channel
     :type converter: :class:`piDA.converters.Converter`
     :param converter_channel: data converter channel associated with
@@ -89,27 +74,24 @@ class OutputChannel(Channel):
     :type converter_channel: :class:`Integer`
 
     """
-    def __init__(self, identifier, description, converter, converter_channel):
-        Channel.__init__(self, identifier, description, converter, converter_channel)
+    def __init__(self, converter, converter_channel):
+        Channel.__init__(self, converter, converter_channel)
 
     def write(self, value):
         """."""
         return self._converter.write(value, self._converter_channel)
 
-class Interface(PidaObject):
+class Interface:
     """Abstract base class for classes that manage data acquisition interfaces operation.
 
-    :param identifier: identifier of the channel
-    :type identifier: :class:`String`
-    :param description: description of the channel
-    :type description: :class:`String`
     :param channel_list:
     :type channel_list:
     """
     __metaclass__ = ABCMeta
 
     def __init__(self, identifier, description, channel_list):
-        PidaObject.__init__(identifier, description)
+        self._identifier = identifier
+        self._description  = description
         self._channel_list = channel_list
 
     @property
@@ -141,15 +123,15 @@ class PidaInterface(Interface):
     def __init__(self):
         identifier = "piDA Interface 1"
         description = ""
-        link0 = SPIDataLink("", "", 100000, 0, 0)
-        adc0 = MCP3202("", "", 3.3, link0)
-        link1 = SPIDataLink("", "", 100000, 0, 1)
-        adc1 = MCP3202("", "", 3.3, link1)
+        link0 = SPIDataLink(100000, 0, 0)
+        adc0 = MCP3202(3.3, link0)
+        link1 = SPIDataLink(100000, 0, 1)
+        adc1 = MCP3202(3.3, link1)
         channel_list = [
-            InputChannel(0, "", adc0, 1),
-            InputChannel(1, "", adc0, 0),
-            InputChannel(2, "", adc1, 1),
-            InputChannel(3, "", adc1, 0)
+            InputChannel(adc0, 1),
+            InputChannel(adc0, 0),
+            InputChannel(adc1, 1),
+            InputChannel(adc1, 0)
             ]
         Interface.__init__(self, identifier, description, channel_list)
 
