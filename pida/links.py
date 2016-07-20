@@ -1,118 +1,109 @@
-""":mod:`piDA.links` --- Data Links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-"""
+# -*- coding: utf-8 -*-
+"""Este módulo incluye clases para gestionar enlaces de datos."""
 from abc import ABCMeta, abstractmethod
 from spidev import SpiDev
 
 class DataLink:
-    """Abstract base class for data link definitions.
+    """Clase base abstracta para la definición de enlaces de datos.
 
-    :param max_speed: maximum speed (hertzs) of the data link
-    :type description: :class:`Number`
-    :param identifier: identifier of the data link
-    :type identifier: :class:`Integer`
-    :param description: description of the data link
-    :type description: :class:`String`
-
+    :param max_speed: máxima velocidad en herzios del enlace de datos.
     """
     __metaclass__ = ABCMeta
 
     def __init__(self, max_speed):
-        self.max_speed = max_speed
-        """Maximum speed in hertzs of the data link."""
+        self._max_speed = max_speed
+
+    @property
+    def max_speed(self):
+        """Velocidad máxima en herzios del enlace de datos.
+
+        Es una propiedad de sólo lectura.
+        """
+        return self._max_speed
 
     @abstractmethod
     def open(self):
-        """Open data link. This method must be called before making
-        the first transference through the link.
+        """Abre el enlace de datos. Este método debe invocarse antes de
+        realizar la primera transferencia por el enlace.
 
-        .. warning:: Abstract method.
-
+        .. warning:: Es un método abstracto que debe ser implementado por todas las clases que hereden de ésta.
         """
         pass
 
     @abstractmethod
     def close(self):
-        """Close data link. Call this method after all transferences
-        have been performed.
+        """Cierra el enlace de datos. Debe invocarse este método cuando no
+        vayan a realizarse más transferencias de datos a través del
+        enlace.
 
-        .. warning:: Abstract method.
-
+        .. warning:: Es un método abstracto que debe ser implementado por todas las clases que hereden de ésta.
         """
         pass
 
     @abstractmethod
     def transfer(self, data):
-        """Send given data through the data link to a device. Return
-        data that device sends back in response.
+        """Transfiere datos entre el equipo y un dispositivo conectado
+        al mismo a través del enlace de datos. 
 
-        :param data: data (bytes) to send.
-        :type data: :class:`List`
+        :param data: lista con los datos a enviar. Cada elemento de la lista es un byte.
+        :return: lista con la respuesta recibida desde el dispositivo. Cada elemento de la lista es un byte.
 
-        .. warning:: Abstract method.
+        .. warning:: Es un método abstracto que debe ser implementado por todas las clases que hereden de ésta.
         """
         pass
 
 
 class SPIDataLink(DataLink):
-    """Class for Serial Peripheral Interface (SPI) management.
+    """Clase que gestiona un enlace Serial Peripheral Interface (SPI).
 
-    :param max_speed: maximum speed (hertzs) of the data link
-    :type description: :class:`Number`
-    :param bus: SPI bus identifier used by the data link
-    :type bus: :class:`Integer`
-    :param device: SPI chip select line used by the data link
-    :type device: :class:`Integer`
-    :param identifier: identifier of the data link
-    :type identifier: :class:`Integer`
-    :param description: description of the data link
-    :type description: :class:`String`
+    :param max_speed: máxima velocidad en herzios del enlace de datos.
+    :param bus: Identificador del bus SPI que se usa para el enlace de datos.
+    :param device: Línea de selección de chip SPI activa en el enlace de datos.
 
+    Ejemplo de uso para pedir una medida del primer canal analógico de un
+    conversor ADC MCP3202 conectado a la línea de selección de chip 0 de Raspberry Pi:
+
+    >>> from pida.links import SPIDataLink
+    >>> link = SPIDataLink(1000000, 0, 0)
+    >>> link.open()
+    >>> request = [1, 2 << 6, 0]
+    >>> response = link.transfer(request)
+    >>> link.close()
     """
     def __init__(self, max_speed, bus, device):
         DataLink.__init__(self, max_speed)
         self._bus = bus
         self._device = device
         self._spi = SpiDev()
-
+        
     @property
     def bus(self):
-        """SPI bus identifier used by the data link.
+        """Identificador del bus SPI que se usa para el enlace de datos.
 
-        .. note:: Raspberry Pi has a single SPI bus that can be
-           accessed through the GPIO port. Its identifier is 0.
+        .. note:: Raspberry Pi ofrece a través de su puerto GPIO
+                  un único bus SPI cuyo identificador es 0.
 
+        Es una propiedad de sólo lectura.
         """
         return self._bus
 
     @property
     def device(self):
-        """SPI chip select line used by the data link.
+        """Línea de selección de chip SPI activa en el enlace de datos.
 
-        .. note:: Raspberry Pi's SPI bus 0 can enable two chip select
-           lines. Their identifiers are 0 and 1.
+        .. note:: El bus SPI 0 de Raspberry Pi puede, a través del puerto GPIO,
+                  activar dos líneas de selección de chip SPI: 0 y 1.
 
+        Es una propiedad de sólo lectura.
         """
         return self._device
 
     def open(self):
-        """Open data link. This method must be called before making
-        the first transference through the link."""
         self._spi.open(self._bus, self._device)
         self._spi.max_speed_hz = self.max_speed
 
     def close(self):
-        """Close data link. Call this method after all transferences
-        have been performed."""
         self._spi.close()
 
     def transfer(self, data):
-        """Send given data through the data link to a device. Return
-        data that device sends back in response.
-
-        :param data: data (bytes) to send.
-        :type data: :class:`List`
-
-        """
         return self._spi.xfer2(data)

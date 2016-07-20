@@ -1,20 +1,16 @@
-""":mod:`piDA.interfaces` --- Data Acquisition interfaces
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+# -*- coding: utf-8 -*-
+"""Este módulo incluye clases para gestionar interfaces de adquisición de
+datos.
 """
 from abc import ABCMeta
 from pida.converters import MCP3002, MCP3202, MCP4802
 from pida.links import SPIDataLink
 
 class Channel:
-    """Class to define a channel of a data acquisition interface.
+    """Clase base abstracta para la gestión de un canal de una interfaz de adquisición de datos.
 
-    :param converter: data converter associated with the channel
-    :type converter: :class:`piDA.converters.Converter`
-    :param converter_channel: data converter channel associated with
-       the channel
-    :type converter_channel: :class:`Integer`
-
+    :param converter: conversor de datos asociado al canal.
+    :param converter_channel: canal del conversor de datos asociado al canal.
     """
     __metaclass__ = ABCMeta
 
@@ -24,68 +20,64 @@ class Channel:
 
     @property
     def converter(self):
-        """.
+        """Conversor de datos asociado al canal.
 
-        *Read-only* property.
-
+        Es una propiedad de sólo lectura.
         """
         return self._converter
 
     @property
     def converter_channel(self):
-        """.
+        """Canal del conversor de datos asociado al canal.
 
-        *Read-only* property.
-
+        Es una propiedad de sólo lectura.
         """
         return self._converter_channel
 
     def open(self):
-        """."""
+        """Abre el canal. Es necesario invocar este método antes de
+        realizar la primera escritura/lectura del canal.
+        """
         self._converter.open()
 
     def close(self):
-        """."""
+        """Cierra el canal."""
         self._converter.close()
 
 class InputChannel(Channel):
-    """Class that manages an input channel of an interface.
+    """Clase para la gestión de un canal de entrada de una interfaz de
+    adquisición de datos.
 
-    :param converter: data converter associated with the channel
-    :type converter: :class:`piDA.converters.Converter`
-    :param converter_channel: data converter channel associated with
-       the channel
-    :type converter_channel: :class:`Integer`
+    :param converter: conversor de datos asociado al canal.
+    :param converter_channel: canal del conversor de datos asociado al canal.
     """
     def __init__(self, converter, converter_channel):
         Channel.__init__(self, converter, converter_channel)
 
     def read(self):
-        """."""
+        """Lee un valor en voltios en el canal."""
         return self._converter.read(self._converter_channel)
 
 class OutputChannel(Channel):
-    """Class that manages an output channel of an interface.
+    """Clase para la gestión de un canal de salida de una interfaz de
+    adquisición de datos.
 
-    :param converter: data converter associated with the channel
-    :type converter: :class:`piDA.converters.Converter`
-    :param converter_channel: data converter channel associated with
-       the channel
-    :type converter_channel: :class:`Integer`
-
+    :param converter: conversor de datos asociado al canal.
+    :param converter_channel: canal del conversor de datos asociado al canal.
     """
     def __init__(self, converter, converter_channel):
         Channel.__init__(self, converter, converter_channel)
 
     def write(self, value):
-        """."""
+        """Escribe un valor en voltios en el canal."""
         return self._converter.write(value, self._converter_channel)
 
 class Interface:
-    """Abstract base class for classes that manage data acquisition interfaces operation.
+    """Clase que define una interfaz de adquisición de datos.
 
-    :param channel_list:
-    :type channel_list:
+    :param identifier: identificador de la interfaz.
+    :param description: descripción de la interfaz.
+    :param channel_list: lista de canales de la interfaz. Cada elemento de la lista es un objeto :class:`Channel`.
     """
     __metaclass__ = ABCMeta
 
@@ -96,30 +88,39 @@ class Interface:
 
     @property
     def identifier(self):
-        """."""
+        """Identificador de la interfaz.
+
+        Es una propiedad de sólo lectura."""
         return self._identifier
 
     @property
     def description(self):
-        """."""
+        """Descripción de la interfaz.
+
+        Es una propiedad de sólo lectura."""
         return self._description
 
     @property
     def channel_list(self):
-        """."""
+        """Lista de canales de la interfaz. Cada elemento de la lista es un
+        objeto :class:`Channel`.
+        
+        Es una propiedad de sólo lectura.
+        """
         return self._channel_list
 
     # TO DO: remove this method, duplicates 'channel_list' property
     def get_channel_list(self):
-        """."""
+        """Devuelve la lista de canales de la interfaz."""
         return self._channel_list
 
     def get_channel_by_id(self, channel_identifier):
-        """."""
+        """Busca en la lista de canales de la interfaz y devuelve el canal
+        que se corresponde con el identificador suministrado."""
         return self._channel_list[channel_identifier]
 
 class PidaInterface(Interface):
-    """Definition of interface 'piDA Interface 1'."""
+    """Clase para gestionar la interfaz de adquisición de datos piDAInterface."""
     def __init__(self):
         identifier = "piDA Interface 1"
         description = ""
@@ -136,7 +137,7 @@ class PidaInterface(Interface):
         Interface.__init__(self, identifier, description, channel_list)
 
 class PidaInterface0(Interface):
-    """Definition of interface 'piDA Interface 0'."""
+    """Clase para gestionar la interfaz de adquisición de datos piDAInterface 0."""
     def __init__(self):
         identifier = "piDA Interface 0"
         description = ""
@@ -149,7 +150,7 @@ class PidaInterface0(Interface):
         Interface.__init__(self, identifier, description, channel_list)
 
 class Gertboard(Interface):
-    """Definition of interface 'Gertboard'."""
+    """Clase para gestionar la interfaz de adquisición de datos Gertboard."""
     def __init__(self):
         identifier = "Gertboard"
         description = ""
