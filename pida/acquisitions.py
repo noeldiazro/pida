@@ -182,9 +182,9 @@ class SynchronousAcquisition(Acquisition):
     de la interfaz de adquisición de datos PidaInterface, con un número
     ilimitado de muestras y una frecuencia de muestreo de 1Hz:
 
-    >>> from pida.interfaces import PidaInterface
+    >>> from pida.interfaces import InterfaceBuilder
     >>> from pida.acquisitions import SynchronousAcquisition
-    >>> interface = PidaInterface()
+    >>> interface = InterfaceBuilder().build("PidaInterface")
     >>> channel0 = interface.get_channel_by_id(0)
     >>> acquisition = SynchronousAcquisition(channel0, 0, 1)
     >>> acquisition.start()

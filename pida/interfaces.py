@@ -73,14 +73,12 @@ class OutputChannel(Channel):
         return self._converter.write(value, self._converter_channel)
 
 class Interface:
-    """Clase que define una interfaz de adquisición de datos.
+    """Clase que gestiona una interfaz de adquisición de datos.
 
     :param identifier: identificador de la interfaz.
     :param description: descripción de la interfaz.
     :param channel_list: lista de canales de la interfaz. Cada elemento de la lista es un objeto :class:`Channel`.
     """
-    __metaclass__ = ABCMeta
-
     def __init__(self, identifier, description, channel_list):
         self._identifier = identifier
         self._description  = description
@@ -119,10 +117,48 @@ class Interface:
         que se corresponde con el identificador suministrado."""
         return self._channel_list[channel_identifier]
 
-class PidaInterface(Interface):
-    """Clase para gestionar la interfaz de adquisición de datos piDAInterface."""
-    def __init__(self):
-        identifier = "piDA Interface 1"
+class InterfaceBuilder:
+    """Clase para definir las interfaces de adquisición de datos.
+    """
+
+    def build(self, interface_id):
+        """Devuelve un objeto para controlar la interfaz de adquisición de datos
+        con el identificador que se pasa como argumento.
+
+        :param interface_id: identificador de la interfaz de adquisición de datos.
+
+        Eleva una excepción :exc:`ValueError` si no se reconoce el identificador.
+        En la actualidad se pueden utilizar los siguientes identificadores:
+
+        - "PidaInterface"
+        - "PidaInterface0"
+        - "Gertboard"
+
+        Ejemplo de uso para generar distintas interfaces:
+
+        >>> from pida.interfaces import InterfaceBuilder
+        >>> builder = InterfaceBuilder()
+        >>> pidaInterface = builder.build("PidaInterface")
+        >>> pidaInterface0 = builder.build("PidaInterface0")
+        >>> gertboard = builder.build("Gertboard")
+        >>> builder.build("Spam")
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+          File "pida/interfaces.py", line 143, in build
+            raise ValueError("Unknown interface")
+        ValueError: Unknown interface
+        """
+        if interface_id == "PidaInterface":
+            return self._build_pida_interface()
+        elif interface_id == "PidaInterface0":
+            return self._build_pida_interface_0()
+        elif interface_id == "Gertboard":
+            return self._build_gertboard()
+        else:
+            raise ValueError("Unknown interface")
+        
+    def _build_pida_interface(self):
+        identifier = "PidaInterface"
         description = ""
         link0 = SPIDataLink(100000, 0, 0)
         adc0 = MCP3202(3.3, link0)
@@ -133,35 +169,31 @@ class PidaInterface(Interface):
             InputChannel(adc0, 0),
             InputChannel(adc1, 1),
             InputChannel(adc1, 0)
-            ]
-        Interface.__init__(self, identifier, description, channel_list)
+        ]
+        return Interface(identifier, description, channel_list)
 
-class PidaInterface0(Interface):
-    """Clase para gestionar la interfaz de adquisición de datos piDAInterface 0."""
-    def __init__(self):
-        identifier = "piDA Interface 0"
+    def _build_pida_interface_0(self):
+        identifier = "PidaInterface0"
         description = ""
-        link0 = SPIDataLink("", "", 1000000, 0, 0)
-        adc0 = MCP3202("", "", 3.3, link0)
+        link0 = SPIDataLink(1000000, 0, 0)
+        adc0 = MCP3202(3.3, link0)
         channel_list = [
-            InputChannel(0, "", adc0, 0),
-            InputChannel(1, "", adc0, 1)
+            InputChannel(adc0, 0),
+            InputChannel(adc0, 1)
             ]
-        Interface.__init__(self, identifier, description, channel_list)
+        return Interface(identifier, description, channel_list)
 
-class Gertboard(Interface):
-    """Clase para gestionar la interfaz de adquisición de datos Gertboard."""
-    def __init__(self):
+    def _build_gertboard(self):
         identifier = "Gertboard"
         description = ""
-        link0 = SPIDataLink("", "", 1000000, 0, 0)
-        adc0 = MCP3002("", "", 3.3, link0)
-        link1 = SPIDataLink("", "", 1000000, 0, 1)
-        dac0 = MCP4802("", "", 2.048, link1)
+        link0 = SPIDataLink(1000000, 0, 0)
+        adc0 = MCP3002(3.3, link0)
+        link1 = SPIDataLink(1000000, 0, 1)
+        dac0 = MCP4802(2.048, link1)
         channel_list = [
-            InputChannel(0, "", adc0, 0),
-            InputChannel(1, "", adc0, 1),
-            OutputChannel(2, "", dac0, 0),
-            OutputChannel(3, "", dac0, 1)
+            InputChannel(adc0, 0),
+            InputChannel(adc0, 1),
+            OutputChannel(dac0, 0),
+            OutputChannel(dac0, 1)
             ]
-        Interface.__init__(self, identifier, description, channel_list)
+        return Interface(identifier, description, channel_list)
