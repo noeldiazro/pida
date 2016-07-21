@@ -179,36 +179,6 @@ class SynchronousAcquisition(Acquisition):
     :param sampling_rate: Frecuencia de muestreo en hertzios. El valor
         por defecto (0) provoca que las muestras se tomen a la máxima
         tasa posible.
-
-    Ejemplo de adquisición síncrona a través del canal de entrada 0
-    de la interfaz de adquisición de datos PidaInterface, con un número
-    ilimitado de muestras y una frecuencia de muestreo de 1Hz:
-
-    >>> from pida.interfaces import InterfaceBuilder
-    >>> from pida.acquisitions import SynchronousAcquisition
-    >>> interface = InterfaceBuilder().build("PidaInterface")
-    >>> channel0 = interface.get_channel_by_id(0)
-    >>> acquisition = SynchronousAcquisition(channel0, 0, 1)
-    >>> acquisition.start()
-    >>> acquisition.print_data(5)
-    Elapsed Time    Value
-    12.000181       1.46389160156
-    13.000177       1.46389160156
-    14.000171       1.46469726562
-    15.000166       1.46389160156
-    16.000172       1.46469726562
-    >>> acquisition.print_data(5)
-    Elapsed Time    Value
-    24.000167       3.29919433594
-    25.000172       3.29919433594
-    26.000168       3.29919433594
-    27.000174       3.29919433594
-    28.000168       3.29919433594
-    >>> acquisition.status
-    'running'
-    >>> acquisition.stop()
-    >>> acquisition.status
-    'stopped'
     """
 
     def __init__(self, channel=None, max_count=0, sampling_rate=0):
