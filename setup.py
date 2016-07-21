@@ -6,7 +6,7 @@ pida
 pida is a library to manage data acquisition hardware
 from Raspberry Pi
 """
-from setuptools import setup
+from setuptools import setup, Extension
 
 setup(
     name='pida',
@@ -24,11 +24,10 @@ setup(
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
+    ],
+    ext_modules=[
+        Extension('clock', ['piDA/src/pyclock.c', 'piDA/src/tsop.c'], libraries=['rt'])
     ]
-    #ext_modules=[
-    #    Extension('clock', ['piDA/src/pyclock.c', 'piDA/src/tsop.c'], libraries=['rt']),
-    #    Extension('spidev', ['piDA/src/spidev_module.c'])
-    #],
     #data_files=[
     #    ('/etc/modprobe.d',['config/raspi-blacklist.conf']),
     #    ('/etc',['config/modules'])
