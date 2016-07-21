@@ -42,6 +42,8 @@ class Acquisition(Thread):
         self.start_time_lock.acquire()
         self.daemon = True
 
+        self.LOCK = Lock()
+
     # Channel
     @property
     def channel(self):
