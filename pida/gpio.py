@@ -54,3 +54,10 @@ class GPIO(object):
     @status.setter
     def status(self, status):
         self._write(self._path + "value", status.value)
+
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
