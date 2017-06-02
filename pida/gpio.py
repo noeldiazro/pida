@@ -61,3 +61,36 @@ class GPIO(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+
+class LED(object):
+
+    def __init__(self, number):
+        self._number = number
+        self._gpio = GPIO(number)
+
+    def open(self):
+        self._gpio.open()
+        self._gpio.direction = Direction.OUTPUT
+
+    def close(self):
+        self._gpio.close()
+
+    def switch_on(self):
+        self._gpio.status = Status.HIGH
+
+    def switch_off(self):
+        self._gpio.status = Status.LOW
+
+    def toggle(self):
+        if self._gpio.status == Status.HIGH:
+            self.switch_off()
+        else:
+            self.switch_on()
+
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
