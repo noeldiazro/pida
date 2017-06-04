@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Este módulo incluye clases para gestionar las E/S de propósito general."""
 from enum import Enum
+import select
 from time import sleep
 
 SYSFS_GPIO_DIR = "/sys/class/gpio/"
@@ -13,6 +14,12 @@ class Status(Enum):
     LOW = "0"
     HIGH = "1"
 
+class Edge(Enum):
+    NONE = "none"
+    RISING = "rising"
+    FALLING = "falling"
+    BOTH = "both"
+    
 class GPIO(object):
     """Clase para gestionar una entrada/salida de propósito general
     (GPIO = General Purpose Input/Output).
@@ -55,6 +62,14 @@ class GPIO(object):
     def status(self, status):
         self._write(self._path + "value", status.value)
 
+    @property
+    def edge(self):
+        return Edge(self._read(self._path + "edge"))
+
+    @edge.setter
+    def edge(self, edge):
+        self._write(self._path + "edge", edge.value)
+
     def __enter__(self):
         self.open()
         return self
@@ -88,6 +103,15 @@ class GPIO(object):
     def get_stream_writer(self):
         return self.GPIOStreamWriter(self._path + "value")
 
+    def wait_for_edge(self):
+        poller = select.epoll()
+        with open(self._path + "value", 'r') as fd:
+            poller.register(fd, select.EPOLLIN | select.EPOLLET | select.EPOLLPRI)
+            for _ in range(2):
+                poller.poll()
+        sleep(0.001)
+        poller.close()            
+        
 
 class LED(object):
 
