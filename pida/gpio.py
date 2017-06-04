@@ -63,6 +63,32 @@ class GPIO(object):
         self.close()
 
 
+    class GPIOStreamWriter(object):
+        def __init__(self, filename):
+            self._filename = filename
+            self._fd = None
+        
+        def open(self):
+            self._fd = open(self._filename, "w")
+
+        def close(self):
+            self._fd.close()
+
+        def write(self, status):
+            self._fd.write(status)
+            self._fd.flush()
+
+        def __enter__(self):
+            self.open()
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            self.close()
+
+    def get_stream_writer(self):
+        return self.GPIOStreamWriter(self._path + "value")
+
+
 class LED(object):
 
     def __init__(self, number):
