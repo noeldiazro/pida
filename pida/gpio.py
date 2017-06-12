@@ -2,7 +2,7 @@
 """Este módulo incluye clases para gestionar las E/S de propósito general."""
 from enum import Enum
 import select
-from time import sleep
+from pida.clock import sleep
 
 SYSFS_GPIO_DIR = "/sys/class/gpio/"
 

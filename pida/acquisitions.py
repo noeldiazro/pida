@@ -6,7 +6,7 @@ disponibles.
 """
 from abc import ABCMeta, abstractmethod
 from threading import Thread, Lock
-from clock import time, sleep
+from pida.clock import time, sleep
 
 class Acquisition(Thread):
     """Clase base abstracta para controlar una adquisición de datos.

@@ -3,23 +3,10 @@
 from abc import ABCMeta, abstractmethod
 from spidev import SpiDev
 
-class DataLink:
+class DataLink(object):
     """Clase base abstracta para la definición de enlaces de datos.
-
-    :param max_speed: máxima velocidad en herzios del enlace de datos.
     """
     __metaclass__ = ABCMeta
-
-    def __init__(self, max_speed):
-        self._max_speed = max_speed
-
-    @property
-    def max_speed(self):
-        """Velocidad máxima en herzios del enlace de datos.
-
-        Es una propiedad de sólo lectura.
-        """
-        return self._max_speed
 
     @abstractmethod
     def open(self):
@@ -40,6 +27,11 @@ class DataLink:
         """
         pass
 
+class FullDuplexDataLink(DataLink):
+    """Clase base abstracta que define la interfaz de enlaces de detos full-duplex.
+    """
+    __metaclass__ = ABCMeta
+    
     @abstractmethod
     def transfer(self, data):
         """Transfiere datos entre el equipo y un dispositivo conectado
@@ -53,29 +45,47 @@ class DataLink:
         pass
 
 
-class SPIDataLink(DataLink):
+class SPIDataLinkConfiguration(object):
+    def __init__(self, mode, max_speed_hz):
+        self._mode = mode
+        self._max_speed_hz = max_speed_hz
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @property
+    def max_speed_hz(self):
+        return self._max_speed_hz
+
+    
+class SPIDataLink(FullDuplexDataLink):
     """Clase que gestiona un enlace Serial Peripheral Interface (SPI).
 
-    :param max_speed: máxima velocidad en herzios del enlace de datos.
     :param bus: Identificador del bus SPI que se usa para el enlace de datos.
     :param device: Línea de selección de chip SPI activa en el enlace de datos.
+    :param configuration: Configuración del enlace de datos
 
-    Ejemplo de uso para pedir una medida del primer canal analógico de un
-    conversor ADC MCP3202 conectado a la línea de selección de chip 0 de Raspberry Pi:
+    Ejemplo de uso:
 
-    >>> from pida.links import SPIDataLink
-    >>> link = SPIDataLink(1000000, 0, 0)
-    >>> link.open()
-    >>> request = [1, 2 << 6, 0]
-    >>> response = link.transfer(request)
-    >>> link.close()
+    >>> from pida.links import SPIDataLinkConfiguration, SPIDataLink
+    >>> configuration = SPIDataLinkConfiguration(mode=0, max_speed_hz=32000000)
+    >>> with SPIDataLink(0, 0, configuration) as link:
+            request = [0x00, 0x01, 0xFF]
+            response = link.transfer(request)
+    >>> response
+    [0, 1, 255]
     """
-    def __init__(self, max_speed, bus, device):
-        DataLink.__init__(self, max_speed)
+    def __init__(self, bus, device, configuration):
         self._bus = bus
         self._device = device
+        self._configuration = configuration
         self._spi = SpiDev()
-        
+
+    def _apply_configuration(self):
+        self._spi.mode = self._configuration.mode
+        self._spi.max_speed_hz = self._configuration.max_speed_hz
+
     @property
     def bus(self):
         """Identificador del bus SPI que se usa para el enlace de datos.
@@ -100,10 +110,25 @@ class SPIDataLink(DataLink):
 
     def open(self):
         self._spi.open(self._bus, self._device)
-        self._spi.max_speed_hz = self.max_speed
+        self._apply_configuration()
 
     def close(self):
         self._spi.close()
 
     def transfer(self, data):
         return self._spi.xfer2(data)
+
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    @property
+    def max_speed_hz(self):
+        return self._configuration.max_speed_hz
+
+    @property
+    def mode(self):
+        return self._configuration.mode

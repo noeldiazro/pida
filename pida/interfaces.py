@@ -204,10 +204,15 @@ class InterfaceBuilder:
     def _build_pida_interface(self):
         identifier = "PidaInterface"
         description = ""
-        link0 = SPIDataLink(100000, 0, 0)
+
+        link0 = SPIDataLink(0, 0)
+        link0.max_speed_hz = 100000
         adc0 = MCP3202(3.3, link0)
-        link1 = SPIDataLink(100000, 0, 1)
+        
+        link1 = SPIDataLink(0, 1)
+        link1.max_speed_hz = 100000
         adc1 = MCP3202(3.3, link1)
+
         channel_list = [
             InputChannel(adc0, 1),
             InputChannel(adc0, 0),
@@ -219,8 +224,11 @@ class InterfaceBuilder:
     def _build_pida_interface_0(self):
         identifier = "PidaInterface0"
         description = ""
-        link0 = SPIDataLink(1000000, 0, 0)
+
+        link0 = SPIDataLink(0, 0)
+        link0.max_speed_hz = 1000000
         adc0 = MCP3202(3.3, link0)
+
         channel_list = [
             InputChannel(adc0, 0),
             InputChannel(adc0, 1)
@@ -230,10 +238,15 @@ class InterfaceBuilder:
     def _build_gertboard(self):
         identifier = "Gertboard"
         description = ""
-        link0 = SPIDataLink(1000000, 0, 0)
+
+        link0 = SPIDataLink(0, 0)
+        link0.max_speed_hz = 1000000        
         adc0 = MCP3002(3.3, link0)
-        link1 = SPIDataLink(1000000, 0, 1)
+
+        link1 = SPIDataLink(0, 1)
+        link1.max_speed_hz = 1000000        
         dac0 = MCP4802(2.048, link1)
+
         channel_list = [
             InputChannel(adc0, 0),
             InputChannel(adc0, 1),
