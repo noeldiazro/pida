@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from benchmark import Benchmark
 from pida.clock import time
 from pida.links import SPIDataLink, SPIDataLinkConfiguration
@@ -34,30 +35,33 @@ class SPIDataLinkTest(Benchmark):
                 print('{}: {}'.format(max_speed, response == request))
 
     
-def _test_average_time_between_requests(request, n_samples, max_speed_hz):
-    configuration = SPIDataLinkConfiguration(0, max_speed_hz)
-    with SPIDataLink(0, 0, configuration) as link:
-        start = time()
-        for _ in range(n_samples):
-            link.transfer(request)
-        end = time()
-    return (end - start) / n_samples
+    def _test_average_time_between_requests(self, request, n_samples, max_speed_hz):
+        configuration = SPIDataLinkConfiguration(0, max_speed_hz)
+        with SPIDataLink(0, 0, configuration) as link:
+            start = time()
+            for _ in range(n_samples):
+                link.transfer(request)
+            end = time()
+        return (end - start) / n_samples
     
-def test_average_time_between_requests():
-    request = [0x00, 0x01, 0x77, 0xFE, 0xFF]
-    n_samples = 10000
-    max_speeds = [
-        int(100e3),
-        int(200e3),
-        int(500e3),
-        int(1e6),
-        int(2e6),
-        int(4e6),
-        int(8e6),
-        int(16e6),
-        int(32e6),
-        int(48e6),
-        int(64e6),]
-    for max_speed in max_speeds:
-        average = _test_average_time_between_requests(request, n_samples, max_speed)
-        print("{}, {}, {}".format(max_speed, average, 1 / average))
+    def test_average_time_between_requests(self):
+        request = [0x00] * 3
+        n_samples = 10000
+        max_speeds = [
+            int(100e3),
+            int(200e3),
+            int(500e3),
+            int(1e6),
+            int(2e6),
+            int(4e6),
+            int(8e6),
+            int(16e6),
+            int(32e6),
+            int(48e6),]
+
+        averages = [1 / self._test_average_time_between_requests(request, n_samples, max_speed) for max_speed in max_speeds]
+        plt.plot(max_speeds, averages, 'o-')
+        plt.xlabel('Frecuencia reloj SPI (Hz)')
+        plt.ylabel('Peticiones promedio por segundo')
+        plt.grid(True)
+        plt.show()
