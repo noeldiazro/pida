@@ -26,7 +26,8 @@ setup(
         'Development Status :: 4 - Beta',
     ],
     ext_modules=[
-        Extension('pida.clock', ['pida/src/pyclock.c', 'pida/src/tsop.c'], libraries=['rt'])
+        Extension('pida.clock', ['pida/src/pyclock.c', 'pida/src/tsop.c'], libraries=['rt']),
+        Extension('pida.scheduling', ['pida/src/schedulingmodule.c'])
     ]
     #data_files=[
     #    ('/etc/modprobe.d',['config/raspi-blacklist.conf']),
