@@ -16,7 +16,8 @@
    interfaces
    converters
    links
-
+   scheduling
+   
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
